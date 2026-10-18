@@ -13,6 +13,8 @@ import {
   ShieldCheck,
   ChevronRight,
 } from 'lucide-react';
+import { ParkingSection } from '../components/parking/ParkingSection';
+
 
 export const VenueDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -291,7 +293,14 @@ export const VenueDetailsPage: React.FC = () => {
               </div>
             ) : null}
           </div>
+
+          {/* Smart Parking Assistance */}
+          <ParkingSection
+            venueId={venue.id}
+            isOwnerOrAdmin={user?.id === venue.ownerId || user?.role === 'ADMIN'}
+          />
         </div>
+
 
         {/* Right Column: Live Booking Panel */}
         <div className="lg:col-span-1">

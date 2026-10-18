@@ -13,6 +13,8 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { MyBookingsPage } from './pages/MyBookingsPage';
 import { OwnerDashboardPage } from './pages/OwnerDashboardPage';
+import { RecommendationsPage } from './pages/RecommendationsPage';
+import { BudgetEstimatorPage } from './pages/BudgetEstimatorPage';
 import { NotPermittedPage } from './pages/NotPermittedPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
@@ -28,6 +30,8 @@ export const App: React.FC = () => {
               <Route path="/" element={<LandingPage />} />
               <Route path="/venues" element={<VenueDiscoveryPage />} />
               <Route path="/venues/:id" element={<VenueDetailsPage />} />
+              <Route path="/recommendations" element={<RecommendationsPage />} />
+              <Route path="/budget-estimator" element={<BudgetEstimatorPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/not-permitted" element={<NotPermittedPage />} />

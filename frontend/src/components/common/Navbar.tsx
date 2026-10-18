@@ -42,6 +42,29 @@ export const Navbar: React.FC = () => {
                 Explore Venues
               </Link>
 
+              <Link
+                to="/recommendations"
+                className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isActive('/recommendations')
+                    ? 'text-green-700 bg-green-50 font-semibold'
+                    : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                }`}
+              >
+                AI Recommender
+              </Link>
+
+              <Link
+                to="/budget-estimator"
+                className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isActive('/budget-estimator')
+                    ? 'text-green-700 bg-green-50 font-semibold'
+                    : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                }`}
+              >
+                Budget Estimator
+              </Link>
+
+
               {user && (
                 <Link
                   to="/bookings"
@@ -133,6 +156,21 @@ export const Navbar: React.FC = () => {
           >
             Explore Venues
           </Link>
+          <Link
+            to="/recommendations"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+          >
+            AI Recommender
+          </Link>
+          <Link
+            to="/budget-estimator"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Budget Estimator
+          </Link>
+
           {user && (
             <Link
               to="/bookings"
