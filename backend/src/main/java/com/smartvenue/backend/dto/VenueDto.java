@@ -52,6 +52,10 @@ public class VenueDto {
             this.approved = venue.getApproved();
         }
 
+        public static VenueResponse fromEntity(Venue venue) {
+            return new VenueResponse(venue);
+        }
+
         public Long getId() { return id; }
         public Long getOwnerId() { return ownerId; }
         public String getOwnerName() { return ownerName; }

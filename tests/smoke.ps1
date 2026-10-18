@@ -6,7 +6,7 @@ $testEmail = "smoke_$uniqueId@demo.com"
 $testPass = "Password123!"
 
 Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host " Starting End-to-End Gate 1 Smoke Test" -ForegroundColor Cyan
+Write-Host " Starting End-to-End Gate 1 & 2 Smoke Test" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
 # 1. Register new customer
@@ -48,7 +48,8 @@ $venueId = $venue.id
 Write-Host "[OK] Found venue ID $venueId ($($venue.name), $($venue.city))" -ForegroundColor Green
 
 # 4. Book a slot
-$eventDate = (Get-Date).AddDays(15).ToString("yyyy-MM-dd")
+$eventDate = (Get-Date).AddDays(30 + ($uniqueId % 100)).ToString("yyyy-MM-dd")
+
 $timeSlot = "MORNING"
 Write-Host "4. Submitting booking for Venue $venueId on $eventDate ($timeSlot)..."
 $bookBody = @{
@@ -121,6 +122,90 @@ if (-not $conflictBlocked) {
     Write-Error "FAILED: Conflict was not blocked."
 }
 
+# =========================================================
+# STAGE 2 VERIFICATION: RECOMMENDATIONS, BUDGET, & PARKING
+# =========================================================
+Write-Host "------------------------------------------" -ForegroundColor Yellow
+Write-Host " 8. Testing AI Venue Recommendation Service..." -ForegroundColor Yellow
+$recBody = @{
+    eventType = "WEDDING"
+    guestCount = 120
+    maxBudget = 5000
+    preferredFacilities = @("WIFI", "PARKING")
+} | ConvertTo-Json
+
+$recResp = Invoke-RestMethod -Uri "$baseUrl/recommendations" -Method Post -Body $recBody -ContentType "application/json"
+if ($recResp.Count -eq 0) {
+    Write-Error "FAILED: Recommendation service returned 0 venues."
+}
+$topVenue = $recResp[0]
+Write-Host "[OK] Recommendations returned $($recResp.Count) candidates. Top match: '$($topVenue.venue.name)' with score: $($topVenue.scoreBreakdown.overallScore)/100" -ForegroundColor Green
+Write-Host "     Plain explanation: $($topVenue.plainExplanation)" -ForegroundColor DarkGray
+
+Write-Host " 9. Testing Event Budget Estimator..." -ForegroundColor Yellow
+$budgetBody = @{
+    eventTitle = "Smoke Test Gala Budget"
+    totalLimit = 15000.00
+    venueCost = 4500.00
+    cateringCost = 3500.00
+    decorationCost = 1500.00
+    photographyCost = 1000.00
+    entertainmentCost = 800.00
+    otherCost = 500.00
+    contingencyPercent = 10.0
+} | ConvertTo-Json
+
+$budgetResp = Invoke-RestMethod -Uri "$baseUrl/budgets" -Method Post -Body $budgetBody -Headers $custHeaders -ContentType "application/json"
+$budgetId = $budgetResp.id
+$actualTotal = [double]$budgetResp.totalEstimatedCost
+
+$isOver = if ($null -ne $budgetResp.isOverBudget) { $budgetResp.isOverBudget } else { $budgetResp.overBudget }
+if ([Math]::Abs($actualTotal - 12980.00) -gt 0.01 -or $isOver -ne $false) {
+    Write-Error "FAILED: Budget math incorrect. Expected total: 12980.00, got: $actualTotal"
+}
+
+
+
+Write-Host "[OK] Budget saved with ID $budgetId. Subtotal: $($budgetResp.subtotal), Total Estimated: $($budgetResp.totalEstimatedCost), OverBudget: $($budgetResp.isOverBudget)" -ForegroundColor Green
+
+# Query saved budgets
+$myBudgets = Invoke-RestMethod -Uri "$baseUrl/budgets/my" -Method Get -Headers $custHeaders
+if ($myBudgets.Count -eq 0) {
+    Write-Error "FAILED: User budgets not retrieved."
+}
+Write-Host "[OK] Retrieved user budgets count: $($myBudgets.Count)" -ForegroundColor Green
+
+Write-Host " 10. Testing Smart Parking Assistance..." -ForegroundColor Yellow
+$parkingLots = Invoke-RestMethod -Uri "$baseUrl/parking/venues/$venueId" -Method Get
+if ($parkingLots.Count -eq 0) {
+    Write-Error "FAILED: No parking lots found for venue $venueId."
+}
+$lot = $parkingLots[0]
+$lotId = $lot.id
+Write-Host "[OK] Found parking lot '$($lot.lotName)': Capacity: $($lot.totalSpots), Occupied: $($lot.occupiedSpots), Available: $($lot.availableSpots), Rate: $($lot.occupancyPercent)%" -ForegroundColor Green
+
+# Owner manual update
+Write-Host " 11. Testing Owner Manual Parking Update..." -ForegroundColor Yellow
+$manualBody = @{
+    occupiedSpots = 55
+} | ConvertTo-Json
+
+$updatedLot = Invoke-RestMethod -Uri "$baseUrl/parking/lots/$lotId/manual" -Method Put -Body $manualBody -Headers $ownerHeaders -ContentType "application/json"
+if ($updatedLot.occupiedSpots -ne 55 -or $updatedLot.dataSource -ne "MANUAL") {
+    Write-Error "FAILED: Manual parking update failed."
+}
+Write-Host "[OK] Parking lot manually updated: Occupied: $($updatedLot.occupiedSpots), Available: $($updatedLot.availableSpots), Source: $($updatedLot.dataSource)" -ForegroundColor Green
+
+# Future Occupancy Prediction
+Write-Host " 12. Testing Future Event Parking Prediction..." -ForegroundColor Yellow
+$predDateStr = (Get-Date).AddDays(10).ToString("yyyy-MM-dd")
+$predResp = Invoke-RestMethod -Uri "$baseUrl/parking/lots/$lotId/prediction?date=$predDateStr&timeSlot=EVENING" -Method Get
+if (-not $predResp.predictedOccupancyPercent -or -not $predResp.predictionBasis) {
+    Write-Error "FAILED: Parking prediction did not return expected fields."
+}
+Write-Host "[OK] Prediction generated for $predDateStr (EVENING): Predicted Occupancy: $($predResp.predictedOccupancyPercent)%, Arrival Window: '$($predResp.suggestedArrivalWindow)'" -ForegroundColor Green
+Write-Host "     Basis: $($predResp.predictionBasis)" -ForegroundColor DarkGray
+
 Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host " [SUCCESS] ALL GATE 1 SMOKE TESTS PASSED!" -ForegroundColor Green
+Write-Host " [SUCCESS] ALL GATE 1 & GATE 2 TESTS PASSED!" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Cyan

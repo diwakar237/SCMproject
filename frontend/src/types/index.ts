@@ -87,3 +87,104 @@ export interface PageResponse<T> {
   size: number;
   number: number;
 }
+
+// Stage 2: Recommendations
+export interface RecommendationRequest {
+  eventType?: string;
+  targetCity?: string;
+  guestCount: number;
+  maxBudget?: number;
+  date?: string;
+  timeSlot?: TimeSlot;
+  preferredFacilities?: string[];
+}
+
+export interface ScoreBreakdown {
+  overallScore: number;
+  budgetScore: number;
+  locationScore: number;
+  capacityScore: number;
+  eventTypeScore: number;
+  facilitiesScore: number;
+  availabilityScore: number;
+}
+
+export interface RecommendationResult {
+  venue: Venue;
+  scoreBreakdown: ScoreBreakdown;
+  plainExplanation: string;
+  matchingHighlights: string[];
+}
+
+// Stage 2: Budgets
+export interface EventBudget {
+  id: number;
+  userId: number;
+  userName?: string;
+  eventTitle: string;
+  totalLimit: number;
+  venueCost: number;
+  cateringCost: number;
+  decorationCost: number;
+  photographyCost: number;
+  entertainmentCost: number;
+  otherCost: number;
+  subtotal: number;
+  contingencyPercent: number;
+  contingencyAmount: number;
+  totalEstimatedCost: number;
+  variance: number;
+  isOverBudget: boolean;
+  currency: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BudgetRequest {
+  eventTitle: string;
+  totalLimit: number;
+  venueCost?: number;
+  cateringCost?: number;
+  decorationCost?: number;
+  photographyCost?: number;
+  entertainmentCost?: number;
+  otherCost?: number;
+  contingencyPercent?: number;
+  currency?: string;
+}
+
+// Stage 2: Parking Assistance
+export type ParkingDataSource = 'SENSOR' | 'MANUAL' | 'SIMULATED_DEMO' | 'PREDICTED';
+
+export interface ParkingHistoryItem {
+  id: number;
+  occupiedSpots: number;
+  dataSource: ParkingDataSource;
+  recordedAt: string;
+}
+
+export interface ParkingLot {
+  id: number;
+  venueId: number;
+  lotName: string;
+  totalSpots: number;
+  occupiedSpots: number;
+  availableSpots: number;
+  occupancyPercent: number;
+  dataSource: ParkingDataSource;
+  lastUpdatedAt: string;
+  suggestedArrivalWindow: string;
+  recentHistory?: ParkingHistoryItem[];
+}
+
+export interface ParkingPrediction {
+  lotId: number;
+  lotName: string;
+  totalSpots: number;
+  predictedOccupiedSpots: number;
+  predictedAvailableSpots: number;
+  predictedOccupancyPercent: number;
+  dataSource: ParkingDataSource;
+  predictionBasis: string;
+  suggestedArrivalWindow: string;
+}

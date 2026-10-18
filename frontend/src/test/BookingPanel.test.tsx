@@ -49,8 +49,12 @@ describe('Venue Booking Panel & Validation', () => {
       if (url.includes('/availability')) {
         return Promise.resolve({ data: mockAvailability });
       }
+      if (url.includes('/parking')) {
+        return Promise.resolve({ data: [] });
+      }
       return Promise.resolve({ data: mockVenue });
     });
+
 
     const mockCustomer = {
       id: 1,

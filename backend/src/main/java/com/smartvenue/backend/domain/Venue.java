@@ -118,6 +118,7 @@ public class Venue {
     public void setImageUrls(String imageUrls) { this.imageUrls = imageUrls; }
 
     public Boolean getApproved() { return approved; }
+    public boolean isApproved() { return Boolean.TRUE.equals(approved); }
     public void setApproved(Boolean approved) { this.approved = approved; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
