@@ -1,0 +1,67 @@
+name: Continuous Integration (CI)
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-build-and-test:
+    name: Backend Compile & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up OpenJDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Compile Backend & Run Unit/Integration Tests
+        working-directory: backend
+        run: |
+          mvn clean test --batch-mode
+
+  frontend-build-and-test:
+    name: Frontend Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run Static Code Analysis (ESLint)
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Run Component Unit Tests (Vitest)
+        working-directory: frontend
+        run: npm test
+
+      - name: Build Production Web Bundle (Vite)
+        working-directory: frontend
+        run: npm run build
