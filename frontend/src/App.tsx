@@ -5,7 +5,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 
-// Pages
+// Stage 1 & 2 Pages
 import { LandingPage } from './pages/LandingPage';
 import { VenueDiscoveryPage } from './pages/VenueDiscoveryPage';
 import { VenueDetailsPage } from './pages/VenueDetailsPage';
@@ -17,6 +17,13 @@ import { RecommendationsPage } from './pages/RecommendationsPage';
 import { BudgetEstimatorPage } from './pages/BudgetEstimatorPage';
 import { NotPermittedPage } from './pages/NotPermittedPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+
+// Stage 3 Pages
+import { VendorsPage } from './pages/VendorsPage';
+import { EventPlannerPage } from './pages/EventPlannerPage';
+import { EventGuestRsvpPage } from './pages/EventGuestRsvpPage';
+import { PublicRsvpPage } from './pages/PublicRsvpPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
 export const App: React.FC = () => {
   return (
@@ -32,6 +39,8 @@ export const App: React.FC = () => {
               <Route path="/venues/:id" element={<VenueDetailsPage />} />
               <Route path="/recommendations" element={<RecommendationsPage />} />
               <Route path="/budget-estimator" element={<BudgetEstimatorPage />} />
+              <Route path="/vendors" element={<VendorsPage />} />
+              <Route path="/rsvp/:token" element={<PublicRsvpPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/not-permitted" element={<NotPermittedPage />} />
@@ -54,6 +63,24 @@ export const App: React.FC = () => {
                 }
               />
 
+              {/* Protected Routes: Event Planner & Guests */}
+              <Route
+                path="/planner"
+                element={
+                  <ProtectedRoute>
+                    <EventPlannerPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/events"
+                element={
+                  <ProtectedRoute>
+                    <EventGuestRsvpPage />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Protected Routes: Owner Dashboard */}
               <Route
                 path="/owner"
@@ -68,6 +95,16 @@ export const App: React.FC = () => {
                 element={
                   <ProtectedRoute allowedRoles={['VENUE_OWNER', 'ADMIN']}>
                     <OwnerDashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Protected Routes: Admin Dashboard */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <AdminDashboardPage />
                   </ProtectedRoute>
                 }
               />

@@ -188,3 +188,185 @@ export interface ParkingPrediction {
   predictionBasis: string;
   suggestedArrivalWindow: string;
 }
+
+// Stage 3: Vendors & Services
+export type VendorBookingStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED';
+
+export interface VendorServiceItem {
+  id: number;
+  vendorId: number;
+  serviceName: string;
+  description: string;
+  basePrice: number;
+  priceUnit: string;
+}
+
+export interface Vendor {
+  id: number;
+  userId: number;
+  businessName: string;
+  category: string;
+  city: string;
+  description: string;
+  contactEmail: string;
+  contactPhone: string;
+  rating: number;
+  reviewCount: number;
+  approved: boolean;
+  services?: VendorServiceItem[];
+}
+
+export interface VendorBooking {
+  id: number;
+  vendorId: number;
+  vendorName: string;
+  customerId: number;
+  customerName: string;
+  customerEmail: string;
+  serviceId?: number;
+  serviceName?: string;
+  eventDate: string;
+  status: VendorBookingStatus;
+  guestCount?: number;
+  totalCost: number;
+  requirements?: string;
+  rejectionReason?: string;
+  createdAt: string;
+}
+
+// Stage 3: Event Planner & Schedule
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'COMPLETED';
+export type TaskCategory = 'VENUE' | 'CATERING' | 'DECOR' | 'LOGISTICS' | 'GUESTS' | 'ENTERTAINMENT' | 'OTHER';
+
+export interface PlannerTask {
+  id: number;
+  userId: number;
+  bookingId?: number;
+  title: string;
+  description?: string;
+  category: TaskCategory;
+  status: TaskStatus;
+  deadlineDate?: string;
+  eventTimeSlot?: string;
+  displayOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Stage 3: Events & RSVP
+export type RsvpStatus = 'ATTENDING' | 'DECLINED' | 'PENDING';
+
+export interface EventGuest {
+  id: number;
+  eventId: number;
+  guestName: string;
+  guestEmail: string;
+  invitationToken: string;
+  rsvpStatus: RsvpStatus;
+  plusOnes: number;
+  dietaryRequirements?: string;
+  notes?: string;
+  respondedAt?: string;
+}
+
+export interface EventEntity {
+  id: number;
+  userId: number;
+  bookingId?: number;
+  title: string;
+  description?: string;
+  eventType: string;
+  eventDate: string;
+  startTime?: string;
+  endTime?: string;
+  locationName: string;
+  locationAddress?: string;
+  dressCode?: string;
+  guests?: EventGuest[];
+  createdAt: string;
+}
+
+export interface PublicInvitation {
+  invitationToken: string;
+  eventTitle: string;
+  description?: string;
+  eventType: string;
+  eventDate: string;
+  startTime?: string;
+  endTime?: string;
+  locationName: string;
+  locationAddress?: string;
+  dressCode?: string;
+  guestName: string;
+  guestEmail: string;
+  rsvpStatus: RsvpStatus;
+  plusOnes: number;
+  dietaryRequirements?: string;
+}
+
+// Stage 3: Reviews
+export interface Review {
+  id: number;
+  userId: number;
+  userName: string;
+  bookingId: number;
+  venueId: number;
+  rating: number;
+  cleanlinessRating?: number;
+  staffRating?: number;
+  valueRating?: number;
+  comment: string;
+  approved: boolean;
+  createdAt: string;
+}
+
+// Stage 3: Payments
+export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+
+export interface Payment {
+  id: number;
+  bookingId: number;
+  bookingReference: string;
+  venueName: string;
+  userId: number;
+  userEmail: string;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  paymentMethod: string;
+  paymentProvider: string;
+  transactionReference: string;
+  receiptNumber: string;
+  createdAt: string;
+}
+
+// Stage 3: Notifications
+export interface Notification {
+  id: number;
+  userId: number;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+// Stage 3: Admin Dashboard
+export interface AdminStats {
+  totalUsers: number;
+  totalVenues: number;
+  totalBookings: number;
+  totalConfirmedRevenue: number;
+  pendingBookingsCount: number;
+  pendingVenuesCount: number;
+  pendingVendorsCount: number;
+  totalReviews: number;
+  recentAuditLogs: Array<{
+    id: number;
+    actorEmail: string;
+    action: string;
+    resourceType: string;
+    resourceId?: string;
+    details?: string;
+    createdAt: string;
+  }>;
+}

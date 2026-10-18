@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { apiClient } from '../api/client';
-import { Venue, VenueAvailability, Booking, TimeSlot } from '../types';
+import { Venue, VenueAvailability, Booking, TimeSlot, Review } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 import {
@@ -12,6 +12,7 @@ import {
   Building2,
   ShieldCheck,
   ChevronRight,
+  MessageSquare,
 } from 'lucide-react';
 import { ParkingSection } from '../components/parking/ParkingSection';
 
@@ -22,6 +23,7 @@ export const VenueDetailsPage: React.FC = () => {
   const { user } = useAuth();
 
   const [venue, setVenue] = useState<Venue | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,6 +56,13 @@ export const VenueDetailsPage: React.FC = () => {
         setVenue(res.data);
         if (res.data.capacity) {
           setGuestCount(Math.min(100, res.data.capacity));
+        }
+
+        try {
+          const revRes = await apiClient.get<Review[]>(`/reviews/venues/${id}`);
+          setReviews(Array.isArray(revRes.data) ? revRes.data : []);
+        } catch {
+          setReviews([]);
         }
       } catch (err: any) {
         setError(err?.response?.data?.message || 'Failed to load venue details.');
@@ -299,6 +308,51 @@ export const VenueDetailsPage: React.FC = () => {
             venueId={venue.id}
             isOwnerOrAdmin={user?.id === venue.ownerId || user?.role === 'ADMIN'}
           />
+
+          {/* Customer Reviews & Feedback Section */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-amber-500" />
+                  Verified Guest Reviews ({reviews.length})
+                </h3>
+                <p className="text-xs text-gray-500">Feedback from customers with confirmed bookings</p>
+              </div>
+              <div className="flex items-center gap-1 bg-amber-50 text-amber-800 px-3 py-1 rounded-full text-xs font-bold border border-amber-200">
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <span>{venue.rating ? venue.rating.toFixed(1) : '5.0'} / 5.0</span>
+              </div>
+            </div>
+
+            {!Array.isArray(reviews) || reviews.length === 0 ? (
+              <p className="text-xs text-gray-500 italic py-2">
+                No published reviews yet. Guests who complete bookings can leave verified ratings.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {(Array.isArray(reviews) ? reviews : []).map((r) => (
+                  <div key={r.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-bold text-gray-900">{r.userName || 'Verified Customer'}</span>
+                      <div className="flex items-center gap-0.5 text-amber-500">
+                        {Array.from({ length: r.rating }).map((_, i) => (
+                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-gray-700 mt-1">{r.comment}</p>
+                    <div className="flex gap-3 text-[10px] text-gray-400 mt-2">
+                      {r.cleanlinessRating && <span>Cleanliness: {r.cleanlinessRating}★</span>}
+                      {r.staffRating && <span>Staff: {r.staffRating}★</span>}
+                      {r.valueRating && <span>Value: {r.valueRating}★</span>}
+                      <span className="ml-auto">{new Date(r.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
 

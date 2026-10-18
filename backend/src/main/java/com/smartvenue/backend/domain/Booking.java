@@ -82,6 +82,9 @@ public class Booking {
     public User getCustomer() { return customer; }
     public void setCustomer(User customer) { this.customer = customer; }
 
+    public User getUser() { return customer; }
+    public void setUser(User user) { this.customer = user; }
+
     public LocalDate getEventDate() { return eventDate; }
     public void setEventDate(LocalDate eventDate) { this.eventDate = eventDate; }
 

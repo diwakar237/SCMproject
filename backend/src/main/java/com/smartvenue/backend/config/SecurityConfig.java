@@ -61,10 +61,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/venues/**").permitAll()
                         .requestMatchers("/api/recommendations/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/parking/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/vendors/**").permitAll()
+                        .requestMatchers("/api/rsvp/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/venues/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/health/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bookings/*/receipt").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+
                         // Protected endpoints
                         .requestMatchers(HttpMethod.PUT, "/api/parking/lots/*/manual").hasAnyRole("VENUE_OWNER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/venues/**").hasAnyRole("VENUE_OWNER", "ADMIN")

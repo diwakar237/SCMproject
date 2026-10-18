@@ -20,6 +20,11 @@ public class Exceptions {
         public BadRequestException(String message) { super(message); }
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class ValidationException extends RuntimeException {
+        public ValidationException(String message) { super(message); }
+    }
+
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public static class ForbiddenException extends RuntimeException {
         public ForbiddenException(String message) { super(message); }

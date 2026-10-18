@@ -6,6 +6,9 @@ import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { EmptyState } from '../components/common/EmptyState';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
+import { MockPaymentModal } from '../components/payment/MockPaymentModal';
+import { ReviewModal } from '../components/reviews/ReviewModal';
+import { CreditCard, Star } from 'lucide-react';
 
 export const MyBookingsPage: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -13,6 +16,10 @@ export const MyBookingsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
+  // Modals state
+  const [paymentTarget, setPaymentTarget] = useState<Booking | null>(null);
+  const [reviewTarget, setReviewTarget] = useState<Booking | null>(null);
 
   // Cancellation state
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
@@ -250,16 +257,42 @@ export const MyBookingsPage: React.FC = () => {
                     </Link>
                   </div>
 
-                  {/* Cancel button if PENDING or CONFIRMED */}
-                  {(b.status === 'PENDING' || b.status === 'CONFIRMED') && (
-                    <button
-                      type="button"
-                      onClick={() => handleOpenCancel(b)}
-                      className="px-3.5 py-2 border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg text-xs font-semibold transition"
-                    >
-                      Cancel Reservation
-                    </button>
-                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {/* Pay Now (Mock) button if CONFIRMED */}
+                    {b.status === 'CONFIRMED' && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentTarget(b)}
+                        className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm"
+                      >
+                        <CreditCard className="w-3.5 h-3.5" />
+                        Pay Now (Mock)
+                      </button>
+                    )}
+
+                    {/* Leave Review button if CONFIRMED */}
+                    {b.status === 'CONFIRMED' && (
+                      <button
+                        type="button"
+                        onClick={() => setReviewTarget(b)}
+                        className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm"
+                      >
+                        <Star className="w-3.5 h-3.5" />
+                        Leave Review
+                      </button>
+                    )}
+
+                    {/* Cancel button if PENDING or CONFIRMED */}
+                    {(b.status === 'PENDING' || b.status === 'CONFIRMED') && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenCancel(b)}
+                        className="px-3.5 py-2 border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg text-xs font-semibold transition"
+                      >
+                        Cancel Reservation
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -323,6 +356,30 @@ export const MyBookingsPage: React.FC = () => {
             )}
           </div>
         </ConfirmDialog>
+      )}
+
+      {/* Mock Payment Gateway Modal */}
+      {paymentTarget && (
+        <MockPaymentModal
+          booking={paymentTarget}
+          isOpen={!!paymentTarget}
+          onClose={() => setPaymentTarget(null)}
+          onPaymentSuccess={() => {
+            fetchBookings(page);
+          }}
+        />
+      )}
+
+      {/* Review Submission Modal */}
+      {reviewTarget && (
+        <ReviewModal
+          booking={reviewTarget}
+          isOpen={!!reviewTarget}
+          onClose={() => setReviewTarget(null)}
+          onSuccess={() => {
+            fetchBookings(page);
+          }}
+        />
       )}
     </div>
   );
