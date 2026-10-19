@@ -86,5 +86,59 @@ describe('VendorsPage Component', () => {
     });
 
     expect(screen.getByText(/Buffet Feast Package/i)).toBeInTheDocument();
+    expect(screen.queryByText(/\$NaN/i)).not.toBeInTheDocument();
+  });
+
+  it('correctly formats vendor service prices without displaying NaN for backend payloads', async () => {
+    (apiClient.get as any).mockResolvedValueOnce({
+      data: {
+        content: [
+          {
+            id: 3,
+            businessName: 'Artisan Culinary Group',
+            category: 'CATERING',
+            city: 'New York',
+            description: 'Gourmet banquet catering.',
+            contactEmail: 'catering@demo.com',
+            rating: 4.9,
+            reviewCount: 28,
+            approved: true,
+            services: [
+              { id: 201, serviceName: 'Classic Banquet Buffet', price: 1800, packageTier: 'STANDARD' },
+            ],
+          },
+        ],
+        totalPages: 1,
+      },
+    });
+
+    render(
+      <AuthContext.Provider
+        value={{
+          user: { id: 1, email: 'customer@demo.com', fullName: 'Demo Customer', role: 'CUSTOMER' },
+          token: 'mock-token',
+          loading: false,
+          login: vi.fn(),
+          register: vi.fn(),
+          logout: vi.fn(),
+          isCustomer: true,
+          isOwner: false,
+          isVendor: false,
+          isOrganizer: false,
+          isAdmin: false,
+        }}
+      >
+        <MemoryRouter>
+          <VendorsPage />
+        </MemoryRouter>
+      </AuthContext.Provider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Artisan Culinary Group')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/\$1,800/i)).toBeInTheDocument();
+    expect(screen.queryByText(/\$NaN/i)).not.toBeInTheDocument();
   });
 });

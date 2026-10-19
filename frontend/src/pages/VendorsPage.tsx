@@ -304,7 +304,7 @@ export const VendorsPage: React.FC = () => {
                           <div key={srv.id} className="flex justify-between items-center text-xs">
                             <span className="text-gray-700 font-medium truncate max-w-[180px]">{srv.serviceName}</span>
                             <span className="font-bold text-indigo-600">
-                              ${Number(srv.basePrice).toLocaleString()} {srv.priceUnit ? `/ ${srv.priceUnit}` : ''}
+                              ${Number(srv.price ?? srv.basePrice ?? 0).toLocaleString()} {srv.priceUnit || srv.packageTier ? `/ ${(srv.priceUnit || srv.packageTier)?.toLowerCase()}` : ''}
                             </span>
                           </div>
                         ))}
@@ -373,7 +373,7 @@ export const VendorsPage: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <span className="text-sm text-gray-500 block">Total Quoted</span>
-                    <span className="text-lg font-bold text-indigo-600">${Number(b.totalCost).toLocaleString()}</span>
+                    <span className="text-lg font-bold text-indigo-600">${Number(b.totalCost ?? b.totalPrice ?? 0).toLocaleString()}</span>
                   </div>
                 </div>
               ))}
@@ -412,7 +412,7 @@ export const VendorsPage: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-indigo-600 mr-2">${Number(ord.totalCost).toLocaleString()}</span>
+                    <span className="text-lg font-bold text-indigo-600 mr-2">${Number(ord.totalCost ?? ord.totalPrice ?? 0).toLocaleString()}</span>
                     {ord.status === 'PENDING' && (
                       <div className="flex gap-2">
                         <button
@@ -468,7 +468,7 @@ export const VendorsPage: React.FC = () => {
                     >
                       {bookingModalVendor.services.map((s) => (
                         <option key={s.id} value={s.id}>
-                          {s.serviceName} - ${Number(s.basePrice).toLocaleString()} {s.priceUnit ? `/ ${s.priceUnit}` : ''}
+                          {s.serviceName} - ${Number(s.price ?? s.basePrice ?? 0).toLocaleString()} {s.priceUnit || s.packageTier ? `/ ${(s.priceUnit || s.packageTier)?.toLowerCase()}` : ''}
                         </option>
                       ))}
                     </select>

@@ -131,7 +131,9 @@ public class VendorDto {
         public String getServiceName() { return serviceName; }
         public String getDescription() { return description; }
         public BigDecimal getPrice() { return price; }
+        public BigDecimal getBasePrice() { return price; }
         public String getPackageTier() { return packageTier; }
+        public String getPriceUnit() { return packageTier != null ? packageTier.toLowerCase() : "package"; }
     }
 
     public static class VendorResponse {
@@ -240,6 +242,7 @@ public class VendorDto {
         public LocalDate getEventDate() { return eventDate; }
         public String getStatus() { return status; }
         public BigDecimal getTotalPrice() { return totalPrice; }
+        public BigDecimal getTotalCost() { return totalPrice; }
         public String getNotes() { return notes; }
         public LocalDateTime getCreatedAt() { return createdAt; }
     }

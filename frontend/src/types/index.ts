@@ -197,8 +197,10 @@ export interface VendorServiceItem {
   vendorId: number;
   serviceName: string;
   description: string;
-  basePrice: number;
-  priceUnit: string;
+  price?: number;
+  basePrice?: number;
+  packageTier?: string;
+  priceUnit?: string;
 }
 
 export interface Vendor {
@@ -228,7 +230,8 @@ export interface VendorBooking {
   eventDate: string;
   status: VendorBookingStatus;
   guestCount?: number;
-  totalCost: number;
+  totalCost?: number;
+  totalPrice?: number;
   requirements?: string;
   rejectionReason?: string;
   createdAt: string;
