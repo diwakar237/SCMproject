@@ -9,12 +9,12 @@ import {
   Star,
   CheckCircle,
   AlertCircle,
-  Building2,
   ShieldCheck,
   ChevronRight,
   MessageSquare,
 } from 'lucide-react';
 import { ParkingSection } from '../components/parking/ParkingSection';
+import { getVenueGalleryImages, getVenueHeroImage } from '../utils/venueImages';
 
 
 export const VenueDetailsPage: React.FC = () => {
@@ -26,6 +26,7 @@ export const VenueDetailsPage: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
 
   // Availability checking state
   const tomorrow = new Date();
@@ -202,12 +203,53 @@ export const VenueDetailsPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Media, Description, Facilities, Availability */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Main Photo Gallery Placeholder */}
-          <div className="h-80 sm:h-96 bg-gradient-to-br from-green-900 via-green-800 to-gray-900 rounded-3xl overflow-hidden relative shadow-md flex items-center justify-center text-white">
-            <div className="text-center space-y-2 p-6">
-              <Building2 className="w-16 h-16 mx-auto text-green-400 opacity-80" />
-              <h3 className="text-xl font-bold">{venue.name}</h3>
-              <p className="text-sm text-green-200">{venue.category} • Capacity: {venue.capacity} guests</p>
+          {/* Main Photo Gallery & Perspectives */}
+          <div className="space-y-3">
+            <div className="h-80 sm:h-96 rounded-3xl overflow-hidden relative shadow-lg group">
+              <img
+                src={getVenueGalleryImages(venue)[selectedImageIndex] || getVenueHeroImage(venue)}
+                alt={venue.name}
+                className="w-full h-full object-cover transition-all duration-500 group-hover:scale-102"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/25 pointer-events-none" />
+              <div className="absolute bottom-6 left-6 right-6 text-white pointer-events-none">
+                <div className="inline-block px-3 py-1 rounded-full bg-emerald-600/90 backdrop-blur-sm text-xs font-semibold uppercase tracking-wider mb-2">
+                  {venue.category}
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-white drop-shadow-md">{venue.name}</h3>
+                <p className="text-sm text-white/90 flex flex-wrap items-center gap-2 mt-1">
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4 text-emerald-300" />
+                    {venue.address}, {venue.city}
+                  </span>
+                  <span>•</span>
+                  <span>Capacity: {venue.capacity} guests</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Interactive Thumbnail Selector */}
+            <div className="grid grid-cols-4 gap-3">
+              {getVenueGalleryImages(venue).map((imgUrl, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSelectedImageIndex(idx)}
+                  className={`relative h-20 sm:h-24 rounded-2xl overflow-hidden border-2 transition-all cursor-pointer ${
+                    selectedImageIndex === idx
+                      ? 'border-emerald-600 ring-2 ring-emerald-500/50 shadow-md scale-[1.02]'
+                      : 'border-transparent opacity-70 hover:opacity-100 hover:scale-[1.01]'
+                  }`}
+                  aria-label={`View photo ${idx + 1} of ${venue.name}`}
+                >
+                  <img
+                    src={imgUrl}
+                    alt={`${venue.name} perspective ${idx + 1}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
           </div>
 

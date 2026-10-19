@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { apiClient } from '../api/client';
 import { Venue, PageResponse } from '../types';
+import { getVenueHeroImage } from '../utils/venueImages';
 import { VenueCardSkeleton } from '../components/common/LoadingSkeleton';
 import { EmptyState } from '../components/common/EmptyState';
 import { ErrorMessage } from '../components/common/ErrorMessage';
@@ -358,23 +359,31 @@ export const VenueDiscoveryPage: React.FC = () => {
                     className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
                   >
                     <div>
-                      {/* Placeholder Card Header */}
-                      <div className="h-44 bg-gradient-to-br from-green-800 via-green-700 to-gray-800 relative p-3 flex flex-col justify-between text-white">
-                        <div className="flex justify-between items-start">
-                          <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
-                            {venue.category}
-                          </span>
-                          <div className="bg-black/60 backdrop-blur-sm text-yellow-400 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                            <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                            <span>{venue.rating.toFixed(1)}</span>
-                            <span className="text-gray-300 font-normal">({venue.reviewCount})</span>
+                      {/* Venue Photo Header */}
+                      <div className="h-48 relative overflow-hidden group">
+                        <img
+                          src={getVenueHeroImage(venue)}
+                          alt={venue.name}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/35 p-3 flex flex-col justify-between text-white">
+                          <div className="flex justify-between items-start">
+                            <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                              {venue.category}
+                            </span>
+                            <div className="bg-black/60 backdrop-blur-sm text-yellow-400 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                              <span>{venue.rating.toFixed(1)}</span>
+                              <span className="text-gray-300 font-normal">({venue.reviewCount})</span>
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Location Tag */}
-                        <div className="flex items-center gap-1 text-xs text-white/90">
-                          <MapPin className="w-3.5 h-3.5 text-green-300" />
-                          <span>{venue.city}</span>
+                          {/* Location Tag */}
+                          <div className="flex items-center gap-1 text-xs text-white/95 font-medium">
+                            <MapPin className="w-3.5 h-3.5 text-green-300" />
+                            <span>{venue.city}</span>
+                          </div>
                         </div>
                       </div>
 
@@ -533,8 +542,16 @@ export const VenueDiscoveryPage: React.FC = () => {
                     <tr className="border-b border-gray-200">
                       <th className="py-3 px-4 font-semibold text-gray-500 w-1/4">Feature</th>
                       {compareList.map((v) => (
-                        <th key={v.id} className="py-3 px-4 font-bold text-gray-900">
-                          {v.name}
+                        <th key={v.id} className="py-3 px-4 font-bold text-gray-900 min-w-[180px]">
+                          <div className="h-28 rounded-xl overflow-hidden mb-2 relative shadow-sm">
+                            <img
+                              src={getVenueHeroImage(v)}
+                              alt={v.name}
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="text-sm line-clamp-1">{v.name}</div>
                         </th>
                       ))}
                     </tr>

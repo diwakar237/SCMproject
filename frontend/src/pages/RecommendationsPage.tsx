@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient } from '../api/client';
 import { RecommendationRequest, RecommendationResult, TimeSlot } from '../types';
+import { getVenueHeroImage } from '../utils/venueImages';
 import { Sparkles, MapPin, Sliders, CheckCircle2, ChevronRight } from 'lucide-react';
 
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
@@ -273,38 +274,47 @@ export const RecommendationsPage: React.FC = () => {
                     key={r.venue.id}
                     className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition space-y-5"
                   >
-                    {/* Top Row: Rank, Title, Overall Score */}
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      <div className="flex items-start gap-3">
-                        <span className="w-8 h-8 rounded-full bg-slate-900 text-white font-black text-sm flex items-center justify-center flex-shrink-0 mt-0.5">
+                    {/* Top Row: Venue Photo, Title, Match Score & Explanation */}
+                    <div className="flex flex-col md:flex-row gap-5">
+                      <div className="w-full md:w-52 h-40 rounded-xl overflow-hidden relative flex-shrink-0 shadow-sm group">
+                        <img
+                          src={getVenueHeroImage(r.venue)}
+                          alt={r.venue.name}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-2.5 left-2.5 w-7 h-7 rounded-full bg-slate-900/90 text-white font-black text-xs flex items-center justify-center backdrop-blur-sm shadow">
                           #{index + 1}
-                        </span>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-xl font-bold text-slate-900">{r.venue.name}</h3>
-                            <span className="text-xs px-2.5 py-0.5 bg-slate-100 text-slate-700 rounded-full font-medium">
-                              {r.venue.category}
-                            </span>
+                        </div>
+                      </div>
+
+                      <div className="flex-1 flex flex-col justify-between space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="text-xl font-bold text-slate-900">{r.venue.name}</h3>
+                              <span className="text-xs px-2.5 py-0.5 bg-slate-100 text-slate-700 rounded-full font-medium">
+                                {r.venue.category}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                              <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                              {r.venue.address}, {r.venue.city}
+                            </p>
                           </div>
-                          <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                            {r.venue.address}, {r.venue.city}
-                          </p>
+
+                          <div className={`px-4 py-2 rounded-2xl border text-center self-start ${scoreColor}`}>
+                            <div className="text-2xl font-black">{score.toFixed(1)}</div>
+                            <div className="text-[10px] uppercase font-bold tracking-wider">Match Score</div>
+                          </div>
+                        </div>
+
+                        {/* Plain Language Explanation */}
+                        <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl text-xs text-slate-700 leading-relaxed flex items-start gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                          <span>{r.plainExplanation}</span>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className={`px-4 py-2 rounded-2xl border text-center ${scoreColor}`}>
-                          <div className="text-2xl font-black">{score.toFixed(1)}</div>
-                          <div className="text-[10px] uppercase font-bold tracking-wider">Match Score</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Plain Language Explanation */}
-                    <div className="bg-slate-50 border border-slate-100 p-3.5 rounded-xl text-xs text-slate-700 leading-relaxed flex items-start gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-                      <span>{r.plainExplanation}</span>
                     </div>
 
                     {/* Matching Highlights */}

@@ -5,6 +5,7 @@ import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { EmptyState } from '../components/common/EmptyState';
 import { ErrorMessage } from '../components/common/ErrorMessage';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
+import { getVenueHeroImage } from '../utils/venueImages';
 
 export const OwnerDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'BOOKINGS' | 'VENUES'>('BOOKINGS');
@@ -347,8 +348,9 @@ export const OwnerDashboardPage: React.FC = () => {
                   className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow transition"
                 >
                   <img
-                    src={v.imageUrls?.split(',')[0] || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=80'}
+                    src={getVenueHeroImage(v)}
                     alt={v.name}
+                    loading="lazy"
                     className="w-full h-44 object-cover"
                   />
                   <div className="p-5">

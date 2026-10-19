@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Search, MapPin, Users, Calendar, ArrowRight, ShieldCheck, Clock, CheckCircle2, Star, Sparkles } from 'lucide-react';
 import { apiClient } from '../api/client';
 import { Venue, PageResponse } from '../types';
+import { getVenueHeroImage } from '../utils/venueImages';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -140,15 +141,25 @@ export const LandingPage: React.FC = () => {
                 key={venue.id}
                 className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col"
               >
-                <div className="h-48 bg-gradient-to-br from-green-700 to-gray-800 relative flex items-center justify-center text-white">
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2.5 py-1 rounded-full">
-                    {venue.category}
+                <div className="h-48 relative overflow-hidden group">
+                  <img
+                    src={getVenueHeroImage(venue)}
+                    alt={venue.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 p-3 flex flex-col justify-between text-white">
+                    <div className="flex justify-between items-start">
+                      <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
+                        {venue.category}
+                      </span>
+                      <div className="bg-black/60 backdrop-blur-sm text-yellow-400 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                        <span>{venue.rating.toFixed(1)}</span>
+                      </div>
+                    </div>
+                    <span className="text-xs text-white/90 font-medium">{venue.city}</span>
                   </div>
-                  <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-yellow-400 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                    <span>{venue.rating.toFixed(1)}</span>
-                  </div>
-                  <span className="text-sm font-medium opacity-75">{venue.city}</span>
                 </div>
 
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
